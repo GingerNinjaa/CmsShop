@@ -10,5 +10,7 @@ namespace CmsShop.Models.Data
     {
         public DbSet<PageDTO> Pages { get; set; }
 
+        public DbSet<SidebarDTO> Sidebar { get; set; }
+
     }
 }
