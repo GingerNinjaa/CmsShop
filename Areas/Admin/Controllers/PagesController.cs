@@ -108,5 +108,60 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View(model);
         }
+
+        // POST: Admin/Pages/EditPage
+        public ActionResult EditPage(PageViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            using (Db db = new Db())
+            {
+                // Pobranie Id strony którą chcemy edytować
+
+                int id = model.Id;
+                // inicjalizacja Slug
+                string slug = "home";
+
+                //Pobranie strony do edycji 
+                PageDTO dto = db.Pages.Find(id);        //Wyszukuje id na podstawie tego co jest podane w formularzu
+
+                dto.Title = model.Title;
+
+                if (model.Slug != "home")
+                {
+                    if (string.IsNullOrWhiteSpace(model.Slug))
+                    {
+                        slug = model.Title.Replace(" ", "-").ToLower();
+                    }
+                    else
+                    {
+                        slug = model.Slug.Replace(" ", "-").ToLower();
+                    }
+                }
+                // Sprawdzenie unikalność strony/adresu 
+                if (db.Pages.Where(x => x.Id != id).Any(x => x.Title == model.Title) ||
+                    db.Pages.Where(x => x.Id != id).Any(x => x.Slug == slug))
+                {
+                    ModelState.AddModelError("", "Strona lub adres strony już istnieje");
+                }
+
+                //modyfikacja DTO
+                dto.Title = model.Title;
+                dto.Body = model.Body;
+                dto.Slug = slug;
+                dto.HasSidebar = model.HasSidebar;
+
+                //zapi edytowanej strony do bazy 
+                db.SaveChanges();
+            }
+            // Ustawienie komunikatu
+            TempData["SM"] = "Wyedytowałeś stronę";
+
+            //Redirect 
+            return RedirectToAction("EditPage");
+        }
     }
 }
