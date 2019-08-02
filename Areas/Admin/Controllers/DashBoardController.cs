@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace CmsShop.Areas.Admin.Controllers
 {
-    public class DashBoardController : Controller
+    public class DashboardController : Controller
     {
         // GET: Admin/DashBoard
         public ActionResult Index()
