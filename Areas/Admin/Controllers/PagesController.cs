@@ -83,6 +83,30 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return RedirectToAction("AddPage");
         }
+        
+        // GET: Admin/Pages/EditPage
+        [HttpGet]
+        public ActionResult EditPage(int id)
+        {
+            // Deklaracja PageViewModel
+            PageViewModel model;
 
+            using (Db db = new Db())
+            {
+                // Pobieramy strone z bazy o podanym id
+                PageDTO dto = db.Pages.Find(id);
+
+                // Sprawdzamy czy taka strona istnieje
+                if (dto == null)
+                {
+                    return Content("Strona nie istnieje");
+                }
+                model = new PageViewModel(dto);
+
+
+            }
+
+            return View(model);
+        }
     }
 }
