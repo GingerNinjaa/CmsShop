@@ -28,9 +28,61 @@ namespace CmsShop.Areas.Admin.Controllers
         }
 
         // GET: Admin/Pages/AddPages
+        [HttpGet]
         public ActionResult addPage()
         {
             return View();
         }
+
+        // GET: Admin/Pages/AddPages
+        [HttpPost]
+        public ActionResult addPage(PageViewModel model)
+        {
+            // Sprawdzanie model state
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            using (Db db = new Db())
+            {
+                string slug;
+
+                //Inicjalizacja PageDTO
+                PageDTO dto = new PageDTO();
+
+                // Gdy niemamy adresu strny to przypisujemy tytuł
+                if (string.IsNullOrWhiteSpace(model.Slug))
+                {
+                    slug = model.Title.Replace(" ","-").ToLower();
+                }
+                else
+                {
+                    slug = model.Slug.Replace(" ", "-").ToLower();
+                }
+
+                //Zapobiegamy dodawaniu takiej samej strony
+                if (db.Pages.Any(x => x.Title == model.Title) || db.Pages.Any(x => x.Slug == model.Slug))
+                {
+                    ModelState.AddModelError("", "Ten tytuł lub adres strony  juz istnieje");
+                    return View(model);
+                }
+                dto.Title = model.Title;
+                dto.Slug = slug;
+                dto.Body = model.Body;
+                dto.HasSidebar = model.HasSidebar;
+                dto.Sorting = 1000;
+
+                // Zapis DTO
+                db.Pages.Add(dto);
+                db.SaveChanges();
+
+            }
+
+            TempData["SM"] = "Dodałeś nową stronę";
+
+            return RedirectToAction("AddPage");
+        }
+
     }
 }
