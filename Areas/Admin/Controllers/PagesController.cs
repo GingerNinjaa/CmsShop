@@ -26,5 +26,11 @@ namespace CmsShop.Areas.Admin.Controllers
             // Zwracamy strony do widoku 
             return View(pagesList);
         }
+
+        // GET: Admin/Pages/AddPages
+        public ActionResult addPage()
+        {
+            return View();
+        }
     }
 }
