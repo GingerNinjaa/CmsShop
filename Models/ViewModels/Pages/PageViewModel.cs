@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 namespace CmsShop.Models.ViewModels.Pages
 {
@@ -33,6 +34,7 @@ namespace CmsShop.Models.ViewModels.Pages
         [Required]
         [StringLength(int.MaxValue, MinimumLength = 3)]     // Maksymalna wartość tego pola to int.MaxValue(Ponieważ w DB ustawiłem MAX),
         [Display(Name = "Zawartość Strony")]                // a minimalna to 3
+        [AllowHtml]                                         // [AllowHtml]    <= Akceptuje czysty HTML
         public string Body { get; set; }
         
         public int Sorting { get; set; }

@@ -4,7 +4,7 @@
     ViewBag.Title = "Dodawanie Strony";
 }
 
-    <h2>Dodawanie Strony</h2>
+<h2>Dodawanie Strony</h2>
 
 @if (TempData["SM"] != null)
 {
@@ -13,11 +13,11 @@
     </div>
 }
 
-@using (Html.BeginForm()) 
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-    
-    <div class="form-horizontal">  
+
+    <div class="form-horizontal">
         <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         <div class="form-group">
@@ -62,3 +62,14 @@
 <div>
     @Html.ActionLink("Powrót", "Index")
 </div>
+
+@section scripts {
+
+
+    <script src="~/Scripts/ckeditor/ckeditor.js"></script>
+    <script>
+
+        CKEDITOR.replace("Body");
+
+    </script>
+}
