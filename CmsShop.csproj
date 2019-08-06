@@ -153,6 +153,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\img\Spinner-1s-100px.gif" />
     <Content Include="Content\img\Spinner-1s-11px.gif" />
+    <Content Include="Content\img\Spinner-1s-30px.gif" />
     <Content Include="favicon.ico" />
     <Content Include="fileman\css\images\animated-overlay.gif" />
     <Content Include="fileman\css\images\ui-bg_flat_0_aaaaaa_40x100.png" />
