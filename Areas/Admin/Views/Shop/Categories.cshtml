@@ -63,7 +63,7 @@ else
             var table = $("Table#pages tbody");
 
 
-            // akcja kiedy klikamy w guzik 
+            // akcja kiedy klikamy w guzik (ENTER)
 
             newCatTextInput.keyup(function (e) {
 
@@ -118,9 +118,9 @@ else
                             newCatTextInput.val("");        //czyszczenie pola tekstowego "dodaj nową kategorię
 
                             var toAppend = $("table#pages tbody tr:last").clone();
-                            toAppend.attr("id", "id_" + data)
+                            toAppend.attr("id", "id_" + data)   // ustawiasz atrybut id do sortowania
                             toAppend.find("#item_Name").val(catName);
-                            toAppend.find("a.delete").attr("href", "/adnin/shop/DeleteCategory/" + data);
+                            toAppend.find("a.delete").attr("href", "/adnin/shop/DeleteCategory/" + data);   // link do usuwania + id 
                             table.append(toAppend);
                             table.sortable("refresh");      //przekazyjemy do tablicy refresh
 

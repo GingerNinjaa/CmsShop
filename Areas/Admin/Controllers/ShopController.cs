@@ -27,5 +27,36 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View(categoryViewModel);
         }
+        //POST: Admin/Shop/AddNewCategory
+        [HttpPost]
+        public string  AddNewCategory(string catName)
+        {
+            // Deklaracja id
+
+            string id;
+            using (Db db = new Db())
+            {
+                // Sprawdzanie unikalności
+                if (db.Categories.Any(x => x.Name == catName))   //Sprawdzenie czy dana kategoria istnieje w bazie danych 
+                {
+                    return "tytułzajety";
+                }
+                
+                    // inicjalizacja DTO
+                    CategoryDTO DTO = new CategoryDTO();
+                    DTO.Name = catName;
+                    DTO.Slug = catName.Replace(" ", "=").ToLower();
+                    DTO.Sorting = 1000;
+
+                    // ZAPIS DO BAZY 
+                    db.Categories.Add(DTO);
+                    db.SaveChanges();
+
+                    //pobieramy id
+                    id = DTO.Id.ToString();
+                
+            }
+                return id;
+        }
     }
 }
