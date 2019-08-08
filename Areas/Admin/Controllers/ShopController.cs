@@ -43,20 +43,66 @@ namespace CmsShop.Areas.Admin.Controllers
                 }
                 
                     // inicjalizacja DTO
-                    CategoryDTO DTO = new CategoryDTO();
-                    DTO.Name = catName;
-                    DTO.Slug = catName.Replace(" ", "=").ToLower();
-                    DTO.Sorting = 1000;
+                    CategoryDTO dto = new CategoryDTO();
+                    dto.Name = catName;
+                    dto.Slug = catName.Replace(" ", "-").ToLower();
+                    dto.Sorting = 1000;
 
                     // ZAPIS DO BAZY 
-                    db.Categories.Add(DTO);
+                    db.Categories.Add(dto);
                     db.SaveChanges();
 
                     //pobieramy id
-                    id = DTO.Id.ToString();
+                    id = dto.Id.ToString();
                 
             }
                 return id;
+
+        }
+        //POST: Admin/Shop/ReorderCategories
+        [HttpPost]
+        public ActionResult ReorderCategories(int[] id)
+        {
+            using (Db db = new Db())
+            {
+                // inicjalizacja licznika 
+                int count = 1;
+
+                //deklaracja DTO
+                CategoryDTO dto;
+
+                //sortowanie kategori
+                foreach (var catId in id)
+                {
+                    dto = db.Categories.Find(catId);        //Przypisujemy do dto (pobrane z bazy kategorie o tym id)
+                    dto.Sorting = count;                    // Zmieniamy dla tej kategori sorting
+
+                    //Zapis na bazie danych
+                    db.SaveChanges();
+
+                    count++;
+                }
+            }
+            return View();
+        }
+        //GET: Admin/Shop/DeleteCategory
+        [HttpGet]
+        public ActionResult DeleteCategory(int id)
+        {
+            using (Db db = new Db())
+            {
+                //Pobieramy Kategorie o podanym id 
+                CategoryDTO dto = db.Categories.Find(id);
+
+                // usuwamy kategorie
+                db.Categories.Remove(dto);
+
+                //zapis na bazie 
+                db.SaveChanges();
+            }
+
+            // przekierowanie do widoku z categoriami
+            return RedirectToAction("Categories");
         }
     }
 }

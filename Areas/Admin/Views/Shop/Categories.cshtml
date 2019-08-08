@@ -11,7 +11,7 @@
     <p>
         <a href="#" id="newCata">Dodaj Nową Kategorie</a>
         <span class="ajax-text">
-            <img  src="~/Content/img/Spinner-1s-30px.gif" />
+            <img src="~/Content/img/Spinner-1s-30px.gif" />
         </span>
     </p>
 
@@ -23,7 +23,7 @@
 }
 else
 {
-    <table class="table sorting" id="pages">
+    <table class="table sorting categories" id="pages">
         <tr class="home">
             <th>
                 @Html.DisplayNameFor(model => model.Name)
@@ -33,7 +33,7 @@ else
 
         @foreach (var item in Model)
         {
-            <tr>
+            <tr id="id_@item.Id">
                 <td>
                     @Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
                 </td>
@@ -79,15 +79,14 @@ else
 
                 var catName = newCatTextInput.val();
 
-                if (catName.length < 2)
-                {
+                if (catName.length < 2) {
                     // to czerwone pod polem tekstowym
                     alert("Nazwa kategori musi mieć conajmniej 2 znaki")
                     return false
                 }
                 //pokazuje gifa "ładowanie"
                 ajaxText.show();
-                
+
                 var url = "/admin/shop/AddNewCategory"
 
                 $.post(url, { catName: catName }, function (data) {
@@ -108,29 +107,24 @@ else
                             location.reload();
                         }
                         else {
-                            ajaxText.html("<spna class = 'alert alert-success'>Kategoria została dodana</span>")
-                        setTimeout(function () {
-                            ajaxText.fadeOut("fast", function () {
-                                ajaxText.html("<img  src=/Content/img/Spinner-1s-30px.gif />");
-                            });
-                        }, 2000);
+                            ajaxText.html("<span class = 'alert alert-success'>Kategoria została dodana</span>")
+                            setTimeout(function () {
+                                ajaxText.fadeOut("fast", function () {
+                                    ajaxText.html("<img  src=/Content/img/Spinner-1s-30px.gif />");
+                                });
+                            }, 2000);
 
                             newCatTextInput.val("");        //czyszczenie pola tekstowego "dodaj nową kategorię
 
                             var toAppend = $("table#pages tbody tr:last").clone();
                             toAppend.attr("id", "id_" + data)   // ustawiasz atrybut id do sortowania
                             toAppend.find("#item_Name").val(catName);
-                            toAppend.find("a.delete").attr("href", "/adnin/shop/DeleteCategory/" + data);   // link do usuwania + id 
+                            toAppend.find("a.delete").attr("href", "/admin/shop/DeleteCategory/" + data);   // link do usuwania + id
                             table.append(toAppend);
                             table.sortable("refresh");      //przekazyjemy do tablicy refresh
 
                         }
-
-
-
                     }
-
-
                 })
 
             })
@@ -139,12 +133,36 @@ else
             /////////////////////////////////////////////////////////////////////////////////
 
             /*
-             * 
+             * Sortowanie kategori
              */
+            // tbody zawartość tabeli
+            $(function () {
+                $("table#pages tbody").sortable({
+                    items: "tr:not(.home)",
+                    placeholder: "ui-state-highlight",
+                    update: function () {
+                        var ids = $("table#pages tbody").sortable("serialize");
+                        var url = "/Admin/Shop/ReorderCategories";
 
+                        $.post(url, ids, function (data) {
 
+                        });
+                    }
+                });
+            });
 
-            })
+            /////////////////////////////////////////////////////////////////////////////////
+
+            /*
+             * Potwierdzenie usuwania kategori
+             */
+            $(function () {
+                $("body").on("click", "a.delete", function () {             //odnosimy sie do body, do body dodajemy zdarzenie click i bedziemy chcieli nadać (clika do każdego elementu delete)
+                    if (!confirm("Potwierdzasz usunięcie kategori")) return false;          // wyswietlanie potwierdzenia czy chce usunąć kategorie
+                });
+            });
+
+        })
 
     </script>
 
