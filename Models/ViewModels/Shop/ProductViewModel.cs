@@ -38,7 +38,7 @@ namespace CmsShop.Models.ViewModels.Shop
         public int CategoryId { get; set; }
         public string ImageName { get; set; }
 
-        public IEnumerable<SelectListItem> Categoriec { get; set; }
+        public IEnumerable<SelectListItem> Categories { get; set; }
         public IEnumerable<string> GaleryImages { get;set;}
     }
 }
