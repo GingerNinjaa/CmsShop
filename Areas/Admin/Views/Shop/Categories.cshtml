@@ -7,9 +7,9 @@
 <h2>Sklep kategorie</h2>
 
 <div class="new-cat">
-    <input type="text" id="newCatName" />
+    <input type="text" id="newcatname" />
     <p>
-        <a href="#" id="newCata">Dodaj Nową Kategorie</a>
+        <a href="#" id="newcata">Dodaj Nową Kategorie</a>
         <span class="ajax-text">
             <img src="~/Content/img/Spinner-1s-30px.gif" />
         </span>
@@ -19,7 +19,7 @@
 
 @if (!Model.Any())
 {
-    <h1 class="text-center">Niema żadnych ketegorii</h1>
+    <h1 class="text-center">Niema żadnych kategorii.</h1>
 }
 else
 {
@@ -58,10 +58,10 @@ else
              * Dodawanie nowej kategori
              */
 
-            var newCatA = $("a#newCata");
-            var newCatTextInput = $("#newCatName");
+            var newCatA = $("a#newcata");
+            var newCatTextInput = $("#newcatname");
             var ajaxText = $("span.ajax-text");
-            var table = $("Table#pages tbody");
+            var table = $("table#pages tbody");
 
 
             // akcja kiedy klikamy w guzik (ENTER)
@@ -71,18 +71,16 @@ else
                 if (e.keyCode == 13) {
                     newCatA.click();
                 }
-
-
             })
-            newCatA.click(function (e) {
 
+            newCatA.click(function (e) {
                 e.preventDefault();
 
                 var catName = newCatTextInput.val();
 
                 if (catName.length < 2) {
                     // to czerwone pod polem tekstowym
-                    alert("Nazwa kategori musi mieć conajmniej 2 znaki")
+                    alert("Nazwa kategori musi mieć conajmniej 2 znaki");
                     return false
                 }
                 //pokazuje gifa "ładowanie"
@@ -93,8 +91,9 @@ else
                 $.post(url, { catName: catName }, function (data) {
 
                     var response = data.trim();
-                    if (response == "tytułzajety") {
-                        ajaxText.html("<spna class = 'alert alert-danger'>Ten tytuł już jest zajęty!</span>")
+
+                    if (response == "tytulzajety") {
+                        ajaxText.html("<span class='alert alert-danger'>Ten tytuł już jest zajęty!</span>")
                         setTimeout(function () {
                             ajaxText.fadeOut("fast", function () {
                                 ajaxText.html("<img  src=/Content/img/Spinner-1s-30px.gif />");
@@ -108,7 +107,7 @@ else
                             location.reload();
                         }
                         else {
-                            ajaxText.html("<span class = 'alert alert-success'>Kategoria została dodana</span>")
+                            ajaxText.html("<span class='alert alert-success'>Kategoria została dodana</span>")
                             setTimeout(function () {
                                 ajaxText.fadeOut("fast", function () {
                                     ajaxText.html("<img  src=/Content/img/Spinner-1s-30px.gif />");
@@ -137,89 +136,91 @@ else
              * Sortowanie kategori
              */
             // tbody zawartość tabeli
-            $(function () {
-                $("table#pages tbody").sortable({
-                    items: "tr:not(.home)",
-                    placeholder: "ui-state-highlight",
-                    update: function () {
-                        var ids = $("table#pages tbody").sortable("serialize");
-                        var url = "/Admin/Shop/ReorderCategories";
 
-                        $.post(url, ids, function (data) {
+            $("table#pages tbody").sortable({
+                items: "tr:not(.home)",
+                placeholder: "ui-state-highlight",
+                update: function () {
+                    var ids = $("table#pages tbody").sortable("serialize");
+                    var url = "/Admin/Shop/ReorderCategories";
 
-                        });
-                    }
-                });
+                    $.post(url, ids, function (data) {
+
+                    });
+                }
             });
 
-            /////////////////////////////////////////////////////////////////////////////////
 
+            /////////////////////////////////////////////////////////
+
+            /*
+             * Potwierdzenie usuwania kategori
+             */
+
+            $("body").on("click", "a.delete", function () {                             //odnosimy sie do body, do body dodajemy zdarzenie click i bedziemy chcieli nadać (clika do każdego elementu delete)
+                if (!confirm("Potwierdzasz usunięcie kategori")) return false;          // wyswietlanie potwierdzenia czy chce usunąć kategorie
+            });
+
+            /////////////////////////////////////////////////////////////
             //Zmiana nazwy kategori
 
 
             var orginalTextBoxValue;
-            $("table#pages input.text-box").dblclick(function () {
 
+            $("table#pages input.text-box").dblclick(function () {          //akcja na podwójny click
                 orginalTextBoxValue = $(this).val();
                 $(this).attr("readonly", false);
             });
 
             $("table#pages input.text-box").keyup(function (e) {
                 if (e.keyCode == 13) {
-                    @(this).blur();
+                    $(this).blur();
                 }
             });
 
             $("table#pages input.text-box").blur(function () {
+
                 var $this = $(this);
                 var ajaxdiv = $this.parent().find(".ajaxdivtd");
-                var newcatName = $this.val();
+                var newCatName = $this.val();
                 var id = $this.parent().parent().attr("id").substring(3);
-                var url = "admin/shop/RenameCategory";
+                var url = "/admin/shop/RenameCategory";
 
                 // Sprawdzam czy nowa nazwa ma więcej niż 2 znaki Jeśli ma <2 znaki to funkcja sie nie wykona
-                if (newcatName.length < 2) {
+                if (newCatName.length < 2) {
                     alert("Nazwa kategori musi mieć conajmniej 2 znaki");
                     $this.attr("readonly", true);
                     return false;
                 }
+
                 //Wywołanie asynchronicznie motody post
-                $.post(url, { newcatName: newcatName, id: id }, function (data) {       //deklarujemy ajax-owa metode ".post" do której przekazujemy url, przekazujemy dane (nowa nazwa kategori to nowa nazwa kategori), id = id 
 
-                        //Odpowiedz true or false 
-                        var response = data.trim();                 // .trim() => Usuwa puste znaki
-                        if (response == "tytułzajety") {
-                            $this.val(orginalTextBoxValue);         // jeśli nazwa kategori nie zostanie zmieniona to przywraca oryginalna wartoć pola nazwa kategorii
-                            ajaxdiv.html("<span class='alert alert-danger'>Ta kategoria jest już zajęta!</span>").show();
-                        }
-                        else {
-                            ajaxdiv.html("<span class='alert alert-succes'>Nazwa kategorii została zmieniona!</span>").show();
-                        }
+                $.post(url, { newCatName: newCatName, id: id }, function (data) {       //deklarujemy ajax-owa metode ".post" do której przekazujemy url, przekazujemy dane (nowa nazwa kategori to nowa nazwa kategori), id = id
 
-                        setTimeout(function () {
-                            ajaxdiv.fadeOut("fast", function () {
-                                ajaxdiv.html("");
-                            });
-                        }, 2000);
+                    //Odpowiedz true or false
+
+                    var response = data.trim();                 // .trim() => Usuwa puste znaki
+
+                    if (response == "tytułzajety") {
+                        $this.val(orginalTextBoxValue);         // jeśli nazwa kategori nie zostanie zmieniona to przywraca oryginalna wartoć pola nazwa kategorii
+                        ajaxdiv.html("<span class='alert alert-danger'>Ta kategoria jest zajęty!</span>").show();
+                    } else {
+                        ajaxdiv.html("<span class='alert alert-success'>Nazwa kategorii została zmieniona!</span>").show();
+                    }
+
+                    setTimeout(function () {
+                        ajaxdiv.fadeOut("fast", function () {
+                            ajaxdiv.html("");
+                        });
+                    }, 2000);
+
                 }).done(function () {
-                        $this.attr("readonly", true);
-                 });
-            });
-
-            /////////////////////////////////////////////////////////
-
-
-            /*
-             * Potwierdzenie usuwania kategori
-             */
-            $(function () {
-                $("body").on("click", "a.delete", function () {                             //odnosimy sie do body, do body dodajemy zdarzenie click i bedziemy chcieli nadać (clika do każdego elementu delete)
-                    if (!confirm("Potwierdzasz usunięcie kategori")) return false;          // wyswietlanie potwierdzenia czy chce usunąć kategorie
+                    $this.attr("readonly", true);
                 });
             });
 
         });
 
     </script>
-
+    }
 }
