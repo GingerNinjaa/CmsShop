@@ -29,7 +29,7 @@ namespace CmsShop.Areas.Admin.Controllers
         }
         //POST: Admin/Shop/AddNewCategory
         [HttpPost]
-        public string  AddNewCategory(string catName)
+        public string AddNewCategory(string catName)
         {
             // Deklaracja id
 
@@ -41,22 +41,22 @@ namespace CmsShop.Areas.Admin.Controllers
                 {
                     return "tytułzajety";
                 }
-                
-                    // inicjalizacja DTO
-                    CategoryDTO dto = new CategoryDTO();
-                    dto.Name = catName;
-                    dto.Slug = catName.Replace(" ", "-").ToLower();
-                    dto.Sorting = 1000;
 
-                    // ZAPIS DO BAZY 
-                    db.Categories.Add(dto);
-                    db.SaveChanges();
+                // inicjalizacja DTO
+                CategoryDTO dto = new CategoryDTO();
+                dto.Name = catName;
+                dto.Slug = catName.Replace(" ", "-").ToLower();
+                dto.Sorting = 1000;
 
-                    //pobieramy id
-                    id = dto.Id.ToString();
-                
+                // ZAPIS DO BAZY 
+                db.Categories.Add(dto);
+                db.SaveChanges();
+
+                //pobieramy id
+                id = dto.Id.ToString();
+
             }
-                return id;
+            return id;
 
         }
         //POST: Admin/Shop/ReorderCategories
@@ -146,6 +146,63 @@ namespace CmsShop.Areas.Admin.Controllers
             }
 
             return View(model);
+        }
+        //POST: Admin/Shop/AddProduct
+        [HttpPost]
+        public ActionResult AddProduct(ProductViewModel model, HttpPostedFileBase file)
+        {
+            // Sprawdzamy model State
+            if (!ModelState.IsValid)
+            {
+                using (Db db = new Db())
+                {
+                    model.Categories = new SelectList(db.Categories.ToList(), "id", "Name");
+                    return View(model);
+                }
+            }
+
+            // sprawdzenie czy nazwa produktu jest unikalna 
+            using (Db db = new Db())
+            {
+                if (db.Products.Any(x => x.Name == model.Name))
+                {
+                    ModelState.AddModelError("","Ta nazwa produktu jest zajęta!");
+                    return View(model);
+                }
+            }
+
+            //Deklaracja product id 
+            int id;
+
+            // dodawanie produktu i zapis na bazie 
+            using (Db db = new Db())
+            {
+                ProductDTO product = new ProductDTO();
+                product.Name = model.Name;
+                product.Slug = model.Name.Replace(" ", "-").ToLower();
+                product.Description = model.Description;
+                product.Price = model.Price;
+                product.CategoryId = model.CategoryId;
+
+                CategoryDTO catDto = db.Categories.FirstOrDefault(x => x.Id == model.CategoryId);
+                product.CategoryName = catDto.Name;
+
+                db.Products.Add(product);
+                db.SaveChanges();
+
+                // pobranie id dodanego produktu
+                id = product.Id;
+            }
+
+            // ustawiamy komunikat 
+            TempData["SM"] = "Dodałeś produkt";
+            #region Upload Image
+
+
+
+            #endregion
+
+            return View();
         }
     }
 }
