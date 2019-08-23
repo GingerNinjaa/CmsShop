@@ -28,10 +28,13 @@ namespace CmsShop.Models.ViewModels.Shop
         
         public int Id { get; set; }
         [Required]
+        [Display(Name = "Nazwa")]
         public string Name { get; set; }
         public string Slug { get; set; }
         [Required]
+        [Display(Name = "Opis")]
         public string Description { get; set; }
+        [Display(Name = "Cena")]
         public decimal Price { get; set; }
         public string CategoryName { get; set; }
         [Required]
@@ -39,6 +42,6 @@ namespace CmsShop.Models.ViewModels.Shop
         public string ImageName { get; set; }
 
         public IEnumerable<SelectListItem> Categories { get; set; }
-        public IEnumerable<string> GaleryImages { get;set;}
+        public IEnumerable<string> GalleryImages { get; set; }
     }
 }

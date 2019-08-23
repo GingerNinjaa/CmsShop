@@ -6,6 +6,13 @@
 
 <h2>Dodaj Produkt</h2>
 
+@if (TempData["SM"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SM"]
+    </div>
+}
+
 @using (Html.BeginForm("AddProduct", "Shop", FormMethod.Post, new { encetype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
@@ -79,6 +86,7 @@
 
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
+
                     reader.onload = function (e) {
                         $("img#imgpreview").attr("src", e.target.result).width(200).height(200);
                     }
@@ -90,5 +98,4 @@
             })
         });
     </script>
-
 }
