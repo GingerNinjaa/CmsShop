@@ -455,5 +455,29 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return RedirectToAction("EditProduct");
         }
+
+        //GET: Admin/Shop/EditProduct   
+        [HttpGet]
+        public ActionResult DeleteProduct(int id)
+        {
+            // usuniecie produktow z bazy
+            using (Db db = new Db())
+            {
+                ProductDTO dto = db.Products.Find(id);
+                db.Products.Remove(dto);
+                db.SaveChanges();
+            }
+
+            //Usuniecie produktu z wszystkimi plikami 
+            var orginalDirector = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+            var pathString = Path.Combine(orginalDirector.ToString(), "Prodcts\\" + id.ToString());
+
+            if (Directory.Exists(pathString))
+            {
+                Directory.Delete(pathString, true);
+            }
+
+            return RedirectToAction("Products");
+        }
     }
 }
