@@ -24,8 +24,8 @@
         }
     }
 </select>
-<br />
-<br />
+<br /><br />
+
 
 
 <p>
@@ -43,7 +43,7 @@
             Cena
         </th>
         <th>
-            Zdjęcie
+            Zdjecie
         </th>
         <th></th>
     </tr>
@@ -66,7 +66,7 @@
             </td>
             <td>
                 @Html.ActionLink("Edycja", "EditProduct", new { id = product.Id }) |
-                @Html.ActionLink("Usuń", "DeleteProduct", new { id = product.Id })
+                @Html.ActionLink("Usuń", "DeleteProduct", new { id = product.Id }, new { @class = "delete" });
             </td>
         </tr>
     }
@@ -77,7 +77,7 @@
 
 @section scripts {
 
-    <script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
 
     <script>
 
@@ -93,7 +93,20 @@
             return false;
         })
 
-        //********************************************************************
+            //********************************************************************
+
+         /*
+        * Potwierdzasz usuniecię produktu
+        */
+        $(function () {
+
+            $("a.delete").click(function () {
+                if (!confirm("Potwierdzasz usuniecię produktu")) return false;
+            });
+
+        });
+            //////////////////////////////////////////////////////////////////
+
 
     </script>
 

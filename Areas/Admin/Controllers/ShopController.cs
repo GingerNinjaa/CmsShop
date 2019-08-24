@@ -291,7 +291,7 @@ namespace CmsShop.Areas.Admin.Controllers
                                     .Select(x => new ProductViewModel(x))
                                     .ToList();
                 // lista kategori do dropDownList
-                ViewBag.Categories = new SelectList (db.Categories.ToList(), "Id", "Name");
+                ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
 
                 // ustawiamy wybrana kategorie 
                 ViewBag.SelectedCat = catId.ToString();
@@ -304,7 +304,156 @@ namespace CmsShop.Areas.Admin.Controllers
             //zwracamy widok z lista produktów
             return View(listOfProductVM);
 
-            
+        }
+
+        //GET: Admin/Shop/EditProduct/id
+        [HttpGet]
+        public ActionResult EditProduct(int id)
+        {
+            //deklaracja productViewModel
+            ProductViewModel model;
+
+            using (Db db = new Db())
+            {
+                // pobieramy produkt do edycji 
+              ProductDTO dto = db.Products.Find(id);
+
+                //Sprawdzamy czy ten produkt istnieje
+                if (dto == null)
+                {
+                    return Content("Ten produkt nie istnieje");
+                }
+
+                // inicjalizacja modelu 
+                model = new ProductViewModel(dto);
+
+                //lista kategori
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+
+                // ustawiamy zdjecia
+                model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+                    .Select(fn => Path.GetFileName(fn));
+            }
+            return View(model); 
+        }
+
+        // POST: Admin/Shop/EditProduct
+        [HttpPost]
+        public ActionResult EditProduct(ProductViewModel model, HttpPostedFileBase file)
+        {
+            // pobranie id produktu
+            int id = model.Id;
+
+            // pobranie kategorii dla listy rozwijanej
+            using (Db db = new Db())
+            {
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+            }
+
+            // ustawiamy zdjecia
+            model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
+                                            .Select(fn => Path.GetFileName(fn));
+
+            // sprawdzamy model state
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            // sprawdzenie unikalnosci nazwy produktu
+            using (Db db = new Db())
+            {
+                if (db.Products.Where(x => x.Id != id).Any(x => x.Name == model.Name))
+                {
+                    ModelState.AddModelError("", "Ta nazwa produktu jest zajęta");
+                    return View(model);
+                }
+            }
+
+            // Edycja produktu i zapis na bazie
+            using (Db db = new Db())
+            {
+                ProductDTO dto = db.Products.Find(id);
+                dto.Name = model.Name;
+                dto.Slug = model.Name.Replace(" ", "-").ToLower();
+                dto.Description = model.Description;
+                dto.Price = model.Price;
+                dto.CategoryId = model.CategoryId;
+                dto.ImageName = model.ImageName;
+
+                CategoryDTO catDto = db.Categories.FirstOrDefault(x => x.Id == model.CategoryId);
+                dto.CategoryName = catDto.Name;
+
+                db.SaveChanges();
+            }
+
+            // ustawienie TempData
+            TempData["SM"] = "Edytowałeś produkt";
+
+            #region Image Upload
+
+            // sprawdzamy czy jest plik
+            if (file != null && file.ContentLength > 0)
+            {
+                // sprawdzamy rozszerzenie pliku czy to jest obrazek
+                string ext = file.ContentType.ToLower();
+
+                if (ext != "image/jpg" &&
+                    ext != "image/jpeg" &&
+                    ext != "image/pjpeg" &&
+                    ext != "image/gif" &&
+                    ext != "image/x-png" &&
+                    ext != "image/png")
+                {
+                    using (Db db = new Db())
+                    {
+                        model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+                        ModelState.AddModelError("", "Obraz nie został przesłany - nieprawidłowe rozszerzenie obrazu.");
+                        return View(model);
+                    }
+                }
+
+                // Utworzenie potrzebnej struktury katalogów
+                var originalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+
+                var pathString1 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString());
+                var pathString2 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
+
+                // usuwamy stare pliki z katalogow
+                DirectoryInfo di1 = new DirectoryInfo(pathString1);
+                DirectoryInfo di2 = new DirectoryInfo(pathString2);
+
+                foreach (var file2 in di1.GetFiles())
+                    file2.Delete();
+
+                foreach (var file3 in di2.GetFiles())
+                    file3.Delete();
+
+                // Zapis nazwy obrazka na bazie
+                string imageName = file.FileName;
+
+                using (Db db = new Db())
+                {
+                    ProductDTO dto = db.Products.Find(id);
+                    dto.ImageName = imageName;
+                    db.SaveChanges();
+                }
+
+                // Zapis nowych plików
+                var path = string.Format("{0}\\{1}", pathString1, imageName);
+                var path2 = string.Format("{0}\\{1}", pathString2, imageName);
+
+                file.SaveAs(path);
+
+                WebImage img = new WebImage(file.InputStream);
+                img.Resize(200, 200);
+                img.Save(path2);
+            }
+
+            #endregion
+
+
+            return RedirectToAction("EditProduct");
         }
     }
 }

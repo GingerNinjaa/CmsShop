@@ -1,10 +1,10 @@
 ﻿@model CmsShop.Models.ViewModels.Pages.PageViewModel
 
 @{
-    ViewBag.Title = "Edycja strony";
+    ViewBag.Title = "Edycja Strony";
 }
 
-<h2>Edycja strony</h2>
+<h2>Edycja Strony</h2>
 
 @if (TempData["SM"] != null)
 {
@@ -66,7 +66,7 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Edycja strony" class="btn btn-default" />
+                <input type="submit" value="Edycja Strony" class="btn btn-default" />
             </div>
         </div>
     </div>
@@ -76,13 +76,12 @@
     @Html.ActionLink("Powrót", "Index")
 </div>
 
-@section scripts {
 
+@section scripts {
 
     <script src="~/Scripts/ckeditor/ckeditor.js"></script>
     <script>
-
         CKEDITOR.replace("Body");
-
     </script>
+
 }
