@@ -479,5 +479,41 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return RedirectToAction("Products");
         }
+
+        // POST: Admin/Shop/SaveGalleryImages/id
+        [HttpPost]
+        public ActionResult SaveGalleryImages(int id)
+        {
+            // petla po obrazkach
+            foreach (string fileName in Request.Files)
+            {
+                // inicjalizacja
+                HttpPostedFileBase file = Request.Files[fileName];
+
+                //Sprawdzenie czy mamy plik i czy nie jest pusty
+                if (file != null && file.ContentLength > 0)
+                {
+                    // ustawiamy ścieżki do katalogow
+                    var oryginalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+
+                    string pathString1 = Path.Combine(oryginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery");
+                    string pathString2 = Path.Combine(oryginalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs");
+
+                    var path = string.Format("{0}\\{1}", pathString1, file.FileName);
+                    var path2 = string.Format("{0}\\{1}", pathString2, file.FileName);
+
+                    //Zapis obrazków i miniaturek
+                    file.SaveAs(path);
+
+                    WebImage img = new WebImage(file.InputStream);
+                    img.Resize(200, 200);
+                    img.Save(path2);
+                }
+            }
+
+            return View();
+        }
+        
+
     }
 }
