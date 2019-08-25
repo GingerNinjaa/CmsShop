@@ -456,7 +456,7 @@ namespace CmsShop.Areas.Admin.Controllers
             return RedirectToAction("EditProduct");
         }
 
-        //GET: Admin/Shop/EditProduct   
+        //GET: Admin/Shop/DeleteProduct/id
         [HttpGet]
         public ActionResult DeleteProduct(int id)
         {
@@ -470,7 +470,7 @@ namespace CmsShop.Areas.Admin.Controllers
 
             //Usuniecie produktu z wszystkimi plikami 
             var orginalDirector = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
-            var pathString = Path.Combine(orginalDirector.ToString(), "Prodcts\\" + id.ToString());
+            var pathString = Path.Combine(orginalDirector.ToString(), "Products\\" + id.ToString());
 
             if (Directory.Exists(pathString))
             {
@@ -513,7 +513,20 @@ namespace CmsShop.Areas.Admin.Controllers
 
             return View();
         }
-        
+
+        // POST: Admin/Shop/DeleteImage
+        [HttpPost]
+        public void DeleteImage(int id, string imageName)
+        {
+            string fullPath1 = Request.MapPath("~/Images/Uploads/Products/" + id.ToString() + "/Gallery/" + imageName);
+            string fullPath2 = Request.MapPath("~/Images/Uploads/Products/" + id.ToString() + "/Gallery/Thumbs/" + imageName);
+
+            if (System.IO.File.Exists(fullPath1))
+                System.IO.File.Delete(fullPath1);
+
+            if (System.IO.File.Exists(fullPath2))
+                System.IO.File.Delete(fullPath2);
+        }
 
     }
 }
