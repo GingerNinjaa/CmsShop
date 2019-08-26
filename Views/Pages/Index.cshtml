@@ -2,8 +2,8 @@
 
 @{
     ViewBag.Title = ViewBag.PageTitle;
-    // podświetlanie PageTitle part 1/2
-    TempData["PageTitle"] = ViewBag.PageTitle;
+
+    TempData["PageTitle"] =  ViewBag.PageTitle;
 }
 
 @Html.Raw(Model.Body)
