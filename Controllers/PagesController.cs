@@ -25,8 +25,8 @@ namespace CmsShop.Controllers
             {
                 //Jeśli strona nie istnieje to przekierowujemy ją na strone główną 
 
-                if (!db.Pages.Any(x => x.Slug.Equals(page)))                
-                    return RedirectToAction("Index", new { page = "" });                
+                if (!db.Pages.Any(x => x.Slug.Equals(page)))
+                    return RedirectToAction("Index", new { page = "" });
             }
 
             // Pobieramy pageDTO
@@ -42,7 +42,7 @@ namespace CmsShop.Controllers
             if (dto.HasSidebar == true)
                 ViewBag.Sidebar = "Tak";
             else
-                ViewBag.Sidebar = "Tak";
+                ViewBag.Sidebar = "Nie";
             // inicjalizujemy pageVM
             model = new PageViewModel(dto);
 
@@ -65,8 +65,27 @@ namespace CmsShop.Controllers
             }
 
             //Zwracamy pageVMList
-                return PartialView(pageViewModelsList);
+            return PartialView(pageViewModelsList);
 
         }
+
+        public ActionResult SidebarPartial()
+        {
+            //deklarujemy model
+            SidebarViewModel model;
+
+            // inicjalizujemy model
+            using (Db db = new Db())
+            {
+                SidebarDTO dto = db.Sidebar.Find(1);
+                model = new SidebarViewModel(dto);
+
+            }
+            // zwracamy partial z modelel
+
+            return PartialView(model);
+        }
+            
+
     }
 }
