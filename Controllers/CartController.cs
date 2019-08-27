@@ -12,8 +12,27 @@ namespace CmsShop.Controllers
         // GET: Cart
         public ActionResult Index()
         {
+            //inicjalizacja koszyka 
+            var cart = Session["cart"] as List<CartViewModel> ?? new List<CartViewModel>();
 
-            return View();
+            //Sprawdzamy czy nasz koszyk jest pusty
+            if (cart.Count ==0 || Session["cart"] == null)
+            {
+                ViewBag.Message = "Twój koszyk jest pusty";
+                return View();
+            }
+
+            // obliczenie wartości  podsumowania koszyka i przekazanie do ViewBag
+            decimal total = 0m;
+
+            foreach (var item in cart)
+            {
+                total += item.Total;
+            }
+
+            ViewBag.GrandTotal = total;
+
+            return View(cart);
         }
         public ActionResult CartPartial()
         {
@@ -40,7 +59,7 @@ namespace CmsShop.Controllers
             {
                 // ustawiamy ilośc i cena na 0
                 qty =  0;
-                price = 0;
+                price = 0m;
             }
 
             return PartialView(model);
