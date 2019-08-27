@@ -55,6 +55,9 @@ namespace CmsShop.Controllers
                     qty += item.Quantity;
                     price += item.Quantity * item.Price;
                 }
+
+                model.Quantity = qty;
+                model.Price = price;
             }
             else
             {
@@ -78,6 +81,7 @@ namespace CmsShop.Controllers
             {
                 // pobieramy produkt 
                 ProductDTO product = db.Products.Find(id);
+
 
                 //sprawdzamy czy ten produkt jest w już w koszyku
                 var productInCart = cart.FirstOrDefault(x => x.ProductId == id);
