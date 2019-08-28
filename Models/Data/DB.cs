@@ -15,6 +15,8 @@ namespace CmsShop.Models.Data
         public DbSet<CategoryDTO> Categories { get; set; }
 
         public DbSet<ProductDTO> Products { get; set; }
+        public DbSet<ProductDTO> Users { get; set; }
+        public DbSet<ProductDTO> Roles { get; set; }
 
     }
 }
