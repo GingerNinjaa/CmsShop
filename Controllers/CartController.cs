@@ -137,5 +137,31 @@ namespace CmsShop.Controllers
 
             return Json(result, JsonRequestBehavior.AllowGet);
         }
+
+        public JsonResult DecrementProduct(int productId)
+        {
+            // inicjalizacja listy CartVM
+            List<CartViewModel> cart = Session["cart"] as List<CartViewModel>;
+
+            // pobieramy cart view model
+            CartViewModel model = cart.FirstOrDefault(x => x.ProductId == productId);
+
+            //zmniejszamy ilośc produktu 
+            if (model.Quantity > 1)
+            {
+                model.Quantity--;
+            }
+            else
+            {
+                model.Quantity = 0;
+                cart.Remove(model);
+            }
+           
+
+            //przygotowanie danych do JSON
+            var result = new { qty = model.Quantity, price = model.Price };
+
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
     }
 }
