@@ -1,5 +1,6 @@
 ﻿using CmsShop.Models.Data;
 using CmsShop.Models.ViewModels.Account;
+using CmsShop.Views.Account;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,6 +143,33 @@ namespace CmsShop.Controllers
 
             return Redirect("~/account/login");
         }
+
+        // GET: 
+        public ActionResult UserNavPartial()
+        {
+            // Pobieramy nazwe użytkownika 
+            string username = User.Identity.Name;
+
+            // Deklarujemy model
+            UserNavPartialViewModel model;
+
+            using (Db db = new Db())
+            {
+                // pobieramy użytkownika 
+                UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == username);
+
+                // budujemy model   
+                model = new UserNavPartialViewModel()
+                {
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName,
+                };
+            }
+
+
+            return PartialView(model);
+        }
+
 
     }
 }
