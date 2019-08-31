@@ -87,7 +87,7 @@ namespace CmsShop.Controllers
                 UserRoleDTO userRoleDTO = new UserRoleDTO()
                 {
                     UserId = usserDTO.Id,
-                    RoleId = 2,
+                    RoleId = 2
                 };
 
                 //Dodanie roli 
@@ -192,6 +192,59 @@ namespace CmsShop.Controllers
             return View("userProfile", model);
         }
 
+        // POST: Account/user-profile
+        [HttpPost]
+        [ActionName("user-profile")]
+        public ActionResult UserProfile(UserProfileViewModel model)
+        {
+            // sprawdzenie model state
+            if (!ModelState.IsValid)
+            {
+                return View("UserProfile", model);
+            }
 
+            // sprawdzamy hasła 
+            if (!string.IsNullOrWhiteSpace(model.Password))
+            {
+                if (!model.Password.Equals(model.ConfirmPassword))
+                {
+                    ModelState.AddModelError("", "Hasła nie pasuja do siebie");
+                    return View("userProfile", model);
+                }
+            }
+
+            using (Db db = new Db())
+            {
+                // pobieramy nazwe użytkownika
+                string username = User.Identity.Name;
+
+                // sprawdzamy czy nazwa użytkownika jest unikalna
+                if (db.Users.Where(x => x.Id != model.Id).Any(x => x.UserName == username))
+                {
+                    ModelState.AddModelError("", "Nazwa użytkownika" + model.UserName + "zajęta ");
+                    model.UserName = "";
+                    return View("UserProfile", model);
+                }
+                // edycja dto 
+                UserDTO dto = db.Users.Find(model.Id);
+                dto.FirstName = model.FirstName;
+                dto.LastName = model.LastName;
+                dto.EmailAddress = model.EmailAddress;
+                dto.UserName = model.UserName;
+
+                if (!string.IsNullOrWhiteSpace(model.Password))
+                {
+                    dto.Password = model.Password;
+                }
+
+                // zapis
+                db.SaveChanges();
+            }
+
+            // ustawienia komunikatu
+            TempData["SM"] = "Edytowałeś swój profil!";
+
+            return Redirect("~/account/user-profile");
+        }
     }
 }
