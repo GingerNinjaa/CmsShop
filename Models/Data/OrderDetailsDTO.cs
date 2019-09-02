@@ -11,7 +11,7 @@ namespace CmsShop.Models.Data
     public class OrderDetailsDTO
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         public int OrderId { get; set; }
         public int UserId { get; set; }
         public int ProductId { get; set; }

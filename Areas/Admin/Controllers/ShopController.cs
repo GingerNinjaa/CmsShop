@@ -1,4 +1,5 @@
-﻿using CmsShop.Models.Data;
+﻿using CmsShop.Areas.Admin.Models.ViewModels.Shop;
+using CmsShop.Models.Data;
 using CmsShop.Models.ViewModels.Shop;
 using PagedList;
 using System;
@@ -171,7 +172,7 @@ namespace CmsShop.Areas.Admin.Controllers
                 if (db.Products.Any(x => x.Name == model.Name))
                 {
                     model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
-                    ModelState.AddModelError("","Ta nazwa produktu jest zajęta!");
+                    ModelState.AddModelError("", "Ta nazwa produktu jest zajęta!");
                     return View(model);
                 }
             }
@@ -208,10 +209,10 @@ namespace CmsShop.Areas.Admin.Controllers
             var originalDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
 
             var pathString1 = Path.Combine(originalDirectory.ToString(), "Products");
-            var pathString2 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() );
-            var pathString3 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs" );   // miniaturka
-            var pathString4 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery" );
-            var pathString5 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs" );
+            var pathString2 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString());
+            var pathString3 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");   // miniaturka
+            var pathString4 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery");
+            var pathString5 = Path.Combine(originalDirectory.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs");
 
             if (!Directory.Exists(pathString1))
                 Directory.CreateDirectory(pathString1);
@@ -316,7 +317,7 @@ namespace CmsShop.Areas.Admin.Controllers
             using (Db db = new Db())
             {
                 // pobieramy produkt do edycji 
-              ProductDTO dto = db.Products.Find(id);
+                ProductDTO dto = db.Products.Find(id);
 
                 //Sprawdzamy czy ten produkt istnieje
                 if (dto == null)
@@ -334,7 +335,7 @@ namespace CmsShop.Areas.Admin.Controllers
                 model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs"))
                     .Select(fn => Path.GetFileName(fn));
             }
-            return View(model); 
+            return View(model);
         }
 
         // POST: Admin/Shop/EditProduct
@@ -526,6 +527,62 @@ namespace CmsShop.Areas.Admin.Controllers
 
             if (System.IO.File.Exists(fullPath2))
                 System.IO.File.Delete(fullPath2);
+        }
+
+        //GET: Admin/Shop/Orders
+        [HttpGet]
+        public ActionResult Orders()
+        {
+
+            //inicjalizacja OrderForAdminViewModel
+            List<OrdersForAdminViewModel> ordersForAdminViewModel = new List<OrdersForAdminViewModel>();
+            using (Db db = new Db())
+            {
+                //pobieramy zamównienia 
+                List<OrderViewModel> orders = db.Orders.ToArray().Select(x => new OrderViewModel(x)).ToList();
+
+                foreach (var order in orders)
+                {
+                    //inicjalizacja slownika produktów 
+                    Dictionary<string, int> productAndQty = new Dictionary<string, int>();
+
+                    decimal total = 0m;
+
+                    // inicjalizacja ordersDetailDTO
+                    List<OrderDetailsDTO> orderDetailsList = db.OrderDetails.Where(x => x.OrderId == order.OrderId).ToList();
+
+                    //pobieramy użytkownika
+                    UserDTO user = db.Users.Where(x => x.Id == order.UserId).FirstOrDefault();
+                    string username = user.UserName;
+
+                    foreach (var orderDetails in orderDetailsList)
+                    {
+                        //pobieramy produkt 
+                        ProductDTO product = db.Products.Where(x => x.Id == orderDetails.ProductId).FirstOrDefault();
+
+                        //pobieramy cene produktu
+                        decimal price = product.Price;
+
+                        //poberamy nazwe produktu
+                        string productname = product.Name;
+
+                        //dodac produkt do słownika 
+                        productAndQty.Add(productname, orderDetails.Quantity);
+
+                        //ustawiamy podsumowanie total
+                        total += orderDetails.Quantity * price;
+                    }
+                    ordersForAdminViewModel.Add(new OrdersForAdminViewModel()
+                    {
+                        OrderNumber = order.OrderId,
+                        UserName = username,
+                        Total = total,
+                        ProductsAnyQty = productAndQty,
+                        CreatedAt = order.CreatedAt
+                    });
+                }
+            }
+            return View(ordersForAdminViewModel);
         }
 
     }
