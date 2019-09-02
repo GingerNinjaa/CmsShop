@@ -196,8 +196,6 @@ else
             /*
             *  usuwanie  produktu z koszyka
             */
-
-
             $("a.removrproduct").click(function (e) {
 
                 e.preventDefault();
@@ -210,12 +208,31 @@ else
                     $this.parent().parent().fadeOut("fast", function () {
                         // przeładowanie strony
                         location.reload();
-                    })
-
-
-
+                    });
                 });
 
+            });
+            //********************************************************************
+
+            /*
+            * Składanie zamówienia
+            */
+            $("a.placeorder").click(function (e) {
+
+                e.preventDefault();
+                var $this = $(this);
+
+                var url = "/cart/PlaceOrder";
+
+                $(".ajaxbg").show();
+                $.post(url, {}, function (data) {
+
+                    $(".ajaxbg span").text("Dziękuję. Zostaniesz teraz przekierowany do systemu PayPal.");
+
+                    setTimeout(function () {
+                        $('form input[name="submit"]').click();
+                    }, 2000);
+                });
             });
             //********************************************************************
 
