@@ -176,5 +176,15 @@ namespace CmsShop.Controllers
             cart.Remove(model);
 
         }
+
+        public ActionResult PayPalPartial ()
+        {
+
+
+            //Inicjalizacja listy CartViewModel
+            List<CartViewModel> cart = Session["cart"] as List<CartViewModel>;
+
+            return PartialView(cart);
+        }
     }
 }
