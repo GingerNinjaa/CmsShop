@@ -18,7 +18,7 @@ namespace CmsShop.Models.Data
         public int Quantity { get; set; }
 
 
-        [ForeignKey("Order  Id")]
+        [ForeignKey("OrderId")]
         public virtual UserDTO Orders { get; set; }
 
         [ForeignKey("UserId")]
