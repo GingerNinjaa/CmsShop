@@ -137,6 +137,7 @@ namespace CmsShop.Controllers
         }
 
         // GET: Account/logout
+        [Authorize]
         public ActionResult Logout()
         {
             // wylogowanie sie 
@@ -145,7 +146,8 @@ namespace CmsShop.Controllers
             return Redirect("~/account/login");
         }
 
-        // GET: 
+        // GET: Account/user-profile
+        [Authorize]
         public ActionResult UserNavPartial()
         {
             // Pobieramy nazwe użytkownika 
@@ -174,6 +176,7 @@ namespace CmsShop.Controllers
         // GET: Account/user-profile
         [HttpGet]
         [ActionName("user-profile")]
+        [Authorize]
         public ActionResult UserProfile()
         {
             // pobieramy nazwe użytkownika
@@ -196,6 +199,7 @@ namespace CmsShop.Controllers
         // POST: Account/user-profile
         [HttpPost]
         [ActionName("user-profile")]
+        [Authorize]
         public ActionResult UserProfile(UserProfileViewModel model)
         {
             // sprawdzenie model state
@@ -250,6 +254,7 @@ namespace CmsShop.Controllers
 
         // GET: Account/Order
         [HttpGet]
+        [Authorize(Roles="User")]
         public ActionResult Orders()
         {
             //inicjalizacja listy zamówien dla użytkownika
